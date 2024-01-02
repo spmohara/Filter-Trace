@@ -234,7 +234,7 @@ def start_event(title, window):
 def main():
     gui_title = 'Filter Trace File'
     gui_layout = define_layout()
-    gui_icon = 'C:\\Users\\sohara\\Projects\\Filter-Trace-File\\data\\filtering.ico'
+    gui_icon = 'filtering.ico'
     gui_window = create_window(gui_title, gui_layout, gui_icon)
     start_event(gui_title, gui_window)
 
