@@ -22,7 +22,7 @@ def show_error(title, text):
     """
     mbox.show(title=title, text=text, button='OK', icon='ICONERROR')
 
-def get_keywords(text, separator, case):
+def get_keywords(text, separator='', case=False):
     """ Retrieves the list of keywords to search.
 
     Parameters
@@ -32,10 +32,10 @@ def get_keywords(text, separator, case):
             ex: ``keyword`` or ``keyword1, keyword2``
 
     separator: str
-        The separator to differentiate multiple keywords.
+        Optional parameter, the separator to differentiate multiple keywords.
 
     case: boolean
-        The case sensitivity of keywords to search.
+        Optional parameter, the case sensitivity of keywords to search.
 
     Returns
     -------
@@ -46,7 +46,7 @@ def get_keywords(text, separator, case):
     if not separator:
         keywords.append(text.strip().lower() if not case else text.strip())
     elif separator in text:
-        for keyword in text.split(separator):
+        for keyword in [item for item in text.split(separator) if item]:
             keywords.append(keyword.strip().lower() if not case else keyword.strip())
     return keywords
 
@@ -56,19 +56,19 @@ def read_lines(path):
     Parameters
     ----------
     path: str
-        The path of the file.
+        The path of the file to read.
             ex: ``'C:\\Users\\example\\file.txt'``
 
     Returns
     -------
     str
-        The file content.
+        The file contents.
     """
     file.path = path
     return file.read_lines()
 
 def get_write_file(path):
-    """ Defines the path and name of the write file.
+    """ Retrieves the name of the write file.
 
     Parameters
     ----------
@@ -79,10 +79,11 @@ def get_write_file(path):
     Returns
     -------
     str
-        The write file path and name.
+        The write file path.
             ex: ``'C:\\Users\\example\\file (filtered).txt'``
     """
-    return path.replace('.txt', ' (filtered).txt')
+    extension = os.path.splitext(path)[1]
+    return path.replace(extension, ' (filtered).txt')
 
 def write_lines(title, path, lines):
     """ Writes the provided lines to the file.
@@ -148,10 +149,10 @@ def define_layout(path='', keywords=''):
     Parameters
     ----------
     path: str
-        Optional parameter used for caching user input.
+        Optional parameter, used for caching user input.
 
     keywords: str or list
-        Optional parameter used for caching user input.
+        Optional parameter, used for caching user input.
 
     Returns
     -------
@@ -162,14 +163,14 @@ def define_layout(path='', keywords=''):
         [sg.Text('Path')],
         [
             sg.InputText(key='Path', default_text=path, tooltip='The path of the file to search'),
-            sg.FileBrowse(initial_folder=os.getcwd(), file_types=[('Text Files', '*.txt')])
+            sg.FileBrowse(initial_folder=os.getcwd())
         ],
         [sg.Text('Keywords')],
         [sg.InputText(key='Keywords', default_text=keywords, tooltip='Single or multiple keywords')],
         [sg.Text('Separator')],
         [sg.InputText(key='Separator', tooltip='Required if using multiple keywords')],
         [sg.Checkbox('Case Sensitive', key='Case Sensitive', tooltip='Case sensitivity of keywords')],
-        [sg.Push(), sg.Button('Generate'), sg.Push()]
+        [sg.Push(), sg.Button('Generate'), sg.Push(), sg.Text('v1.2.0')]
     ]
     return layout
 

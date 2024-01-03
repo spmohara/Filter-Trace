@@ -17,7 +17,8 @@ def get_keywords():
         return get_keywords()
 
 def get_write_file():
-    return read_file.replace('.txt', ' (filtered).txt')
+    extension = os.path.splitext(read_file)[1]
+    return read_file.replace(extension, ' (filtered).txt')
 
 def read_lines():
     with open(read_file) as f:

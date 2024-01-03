@@ -27,7 +27,6 @@ class FileHandler:
     def __init__(self):
         self._path = ''
 
-    # GETTERS/SETTERS
     @property
     def path(self):
         return self._path
@@ -39,7 +38,6 @@ class FileHandler:
         else:
             raise ValueError('Invalid file path attribute specified')
 
-    # HELPER METHODS
     def _file_handler(self, method='read', param=None):
         """ Handles the opening/closing and reading/writing of the file.
 
@@ -70,7 +68,6 @@ class FileHandler:
         except FileNotFoundError:
             raise AttributeError('File does not exist')
 
-    # USER METHODS
     def read(self):
         """ Reads the contents of the file.
 
