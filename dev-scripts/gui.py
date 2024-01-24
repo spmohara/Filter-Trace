@@ -1,36 +1,36 @@
 import PySimpleGUI as sg
 import os
 
-def create(title='Filter Trace File'):
-    layout = [
-        [sg.Text('Path')],
-        [
-            sg.InputText(key='Path', tooltip='The path of the file to search'),
-            sg.FileBrowse(initial_folder=os.getcwd(), file_types=[('Text Files', '*.txt')])
-        ],
-        [sg.Text('Keywords')],
-        [sg.InputText(key='Keywords', tooltip='Single keyword or multiple separated by commas')],
-        [sg.Push(), sg.Button('Generate'), sg.Push()]
-    ]
+GUI_TITLE = 'Filter Trace File'
 
-    window = sg.Window(title, layout)
+layout = [
+    [sg.Text('Path')],
+    [
+        sg.InputText(key='Path'),
+        sg.FileBrowse(initial_folder=os.getcwd(), file_types=[('Text Files', '*.txt')])
+    ],
+    [sg.Text('Keywords')],
+    [sg.InputText(key='Keywords')],
+    [sg.Push(), sg.Button('Generate'), sg.Push()]
+]
 
-    while True:
-        event, values = window.read()
-        if event == sg.WIN_CLOSED:
-            break
-        elif event == 'Generate':
-            if values['Path'] and os.path.isfile(values['Path']):
-                path = values['Path']
-                if values['Keywords']:
-                    keywords = [keyword.strip() for keyword in values['Keywords'].split(',')]
-                    print('Path:', path, '\n' 'Keywords:', keywords)
-                    return (path, keywords)
-                else:
-                    print('Missing keywords')
+window = sg.Window(GUI_TITLE, layout)
+
+while True:
+    event, values = window.read()
+    if event == sg.WIN_CLOSED:
+        break
+    elif event == 'Generate':
+        path_ = values['Path']
+        if not path_:
+            print('Missing path')
+        elif not os.path.isfile(path_):
+            print('Invalid path')
+        else:
+            if not values['Keywords']:
+                print('Missing keywords')
             else:
-                print('Missing or invalid path')
-    window.close()
+                keywords = [keyword.strip() for keyword in values['Keywords'].split(',')]
+                print('Path:', path_, '\n' 'Keywords:', keywords)
 
-if __name__ == '__main__':
-    create()
+window.close()

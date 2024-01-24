@@ -1,26 +1,90 @@
 import PySimpleGUI as sg
-import os
 import mbox
-from file import FileHandler
+from filemanager import FileManager
 
-file = FileHandler()
+VERSION = 'v1.2.1'
+GUI_TITLE = 'Filter Trace File'
+GUI_ICON = 'C:\\Users\\sohara\\Projects\\Filter-Trace-File\\icons\\filtering.ico'
 
-def show_error(title, text):
-    """ Shows an error message box based on the provided parameters.
+file_manager = FileManager()
 
-    Parameters
-    ----------
-    title: str
-        The title shown on message box.
-
-    text: str
-        The text shown on message box.
+def define_layout():
+    """ Defines the layout of the GUI.
 
     Returns
     -------
-    None
+    list
+        The GUI layout.
     """
-    mbox.show(title=title, text=text, button='OK', icon='ICONERROR')
+    layout = [
+        [sg.Text('Path')],
+        [
+            sg.InputText(key='Path', tooltip='The path of the file to search'),
+            sg.FileBrowse(initial_folder=file_manager.get_current_directory())
+        ],
+        [sg.Text('Keywords')],
+        [sg.InputText(key='Keywords', tooltip='Single or multiple keywords')],
+        [sg.Text('Separator')],
+        [sg.InputText(key='Separator', tooltip='Required if using multiple keywords')],
+        [sg.Checkbox('Case Sensitive', key='Case Sensitive', tooltip='Case sensitivity of keywords')],
+        [sg.Push(), sg.Button('Generate', bind_return_key=True), sg.Push(), sg.Text(VERSION)]
+    ]
+    return layout
+
+def create_window(layout):
+    """ Creates the GUI window based on the GUI layout.
+
+    Parameters
+    ----------
+    layout: list
+        The GUI layout.
+
+    Returns
+    -------
+    PySimpleGUI.PySimpleGUI.Window
+        The GUI window object.
+    """
+    return sg.Window(title=GUI_TITLE, layout=layout, icon=GUI_ICON)
+
+def start_event(window):
+    """ Starts the event loop for the GUI window object.
+
+    Parameters
+    ----------
+    window: PySimpleGUI.PySimpleGUI.Window
+        The GUI window object.
+    """
+    while True:
+        event, values = window.read()
+        if event == sg.WIN_CLOSED:
+            break
+        elif event == 'Generate':
+            path = values['Path']
+            if not path:
+                show_error('Missing path')
+            elif not file_manager.is_file(path):
+                show_error('Invalid path')
+            else:
+                if not values['Keywords']:
+                    show_error('Missing keywords')
+                else:
+                    separator = values['Separator']
+                    case = values['Case Sensitive']
+                    keywords = get_keywords(values['Keywords'], separator, case)
+                    if not keywords:
+                        show_error('Missing separator in keywords')
+                    else:
+                        data = get_lines(path)                            
+                        if data:
+                            lines = search_lines(data, keywords, case)
+                            if not lines:
+                                show_error('No keywords found')
+                            else:
+                                write_new_lines(path, lines)
+                                show_info('File Generated')
+                        elif isinstance(data, list):
+                            show_error('No file data found')
+    window.close()
 
 def get_keywords(text, separator='', case=False):
     """ Retrieves the list of keywords to search.
@@ -34,7 +98,7 @@ def get_keywords(text, separator='', case=False):
     separator: str
         Optional parameter, the separator to differentiate multiple keywords.
 
-    case: boolean
+    case: bool
         Optional parameter, the case sensitivity of keywords to search.
 
     Returns
@@ -50,22 +114,53 @@ def get_keywords(text, separator='', case=False):
             keywords.append(keyword.strip().lower() if not case else keyword.strip())
     return keywords
 
-def read_lines(path):
-    """ Reads the contents of the file.
+def get_lines(path):
+    """ Retrieves the lines of the file (if any).
 
     Parameters
     ----------
     path: str
         The path of the file to read.
-            ex: ``'C:\\Users\\example\\file.txt'``
+            ex: ``'C:\\Users\\johndoe\\Documents\\trace.txt'``
 
     Returns
     -------
     str
-        The file contents.
+        The lines of the file.
     """
-    file.path = path
-    return file.read_lines()
+    try:
+        return file_manager.read_all_lines(path)
+    except Exception as e:
+        show_error(str(e))
+
+def search_lines(data, keywords, case):
+    """ Searches the file data based on the provided keywords and case.
+
+    Parameters
+    ----------
+    data: list
+        The lines of the file.
+
+    keywords: list
+        The list of keywords to search.
+            ex: ``['keyword']`` or ``['keyword1', 'keyword2']``
+
+    case: bool
+        The case sensitivity of keywords to search.
+
+    Returns
+    -------
+        list
+            The new lines to write.
+    """
+    lines = []
+    for number, line in enumerate(data, start=1):
+        for keyword in keywords:
+            keyword = keyword.lower() if not case else keyword
+            if keyword in (line.lower() if not case else line):
+                lines.append(f'{number}: {line}')
+                break
+    return lines
 
 def get_write_file(path):
     """ Retrieves the name of the write file.
@@ -74,170 +169,61 @@ def get_write_file(path):
     ----------
     path: str
         The path of the read file.
-            ex: ``'C:\\Users\\example\\file.txt'``
+            ex: ``'C:\\Users\\johndoe\\Documents\\trace.txt'``
 
     Returns
     -------
     str
         The write file path.
-            ex: ``'C:\\Users\\example\\file (filtered).txt'``
+            ex: ``'C:\\Users\\johndoe\\Documents\\trace (filtered).txt'``
     """
-    extension = os.path.splitext(path)[1]
-    return path.replace(extension, ' (filtered).txt')
+    extension = file_manager.get_file_extension(path)
+    if not extension or extension == '.':
+        return path.rstrip('.') + ' (filtered).txt'
+    else:
+        return path.replace(extension, ' (filtered).txt')
 
-def write_lines(title, path, lines):
+def write_new_lines(path, lines):
     """ Writes the provided lines to the file.
 
     Parameters
     ----------
-    title: str
-        The title shown on message box.
-
     path: str
         The path of the file.
-            ex: ``'C:\\Users\\example\\file.txt'``
+            ex: ``'C:\\Users\\johndoe\\Documents\\trace.txt'``
 
-    lines: str
+    lines: list
         The lines to write.
-
-    Returns
-    -------
-    None
     """
-    if lines:
-        file.path = get_write_file(path)
-        file.write_lines(lines)
-        mbox.show(title=title, text='File Generated', button='OK', icon='ICONINFORMATION')
-    else:
-        show_error(title, 'No keywords found')
+    try:
+        file_manager.write_lines(lines, get_write_file(path))
+    except Exception as e:
+        show_error(str(e))
 
-def search_lines(title, path, keywords, case):
-    """ Searches the file based on the provided path and keywords.
+def show_error(text):
+    """ Shows an error message box based on the provided text.
 
     Parameters
     ----------
-    title: str
-        The title shown on message box.
-
-    path: str
-        The path of the file.
-            ex: ``'C:\\Users\\example\\file.txt'``
-
-    keywords: list
-        The list of keywords to search.
-            ex: ``['keyword']`` or ``['keyword1', 'keyword2']``
-
-    case: boolean
-        The case sensitivity of keywords to search.
-
-    Returns
-    -------
-    None
+    text: str
+        The text shown on message box.
     """
-    lines = ''
-    for number, line in enumerate(read_lines(path), 1):
-        for keyword in keywords:
-            keyword = keyword.lower() if not case else keyword
-            if keyword in (line.lower() if not case else line):
-                lines += f'{number}: {line}'
-                break
-    write_lines(title, path, lines)
-    
-def define_layout(path='', keywords=''):
-    """ Defines the layout of the GUI.
+    mbox.show(title=GUI_TITLE, text=text, icon='ICONERROR')
+
+def show_info(text):
+    """ Shows an informative message box based on the provided text.
 
     Parameters
     ----------
-    path: str
-        Optional parameter, used for caching user input.
-
-    keywords: str or list
-        Optional parameter, used for caching user input.
-
-    Returns
-    -------
-    list
-        The GUI layout.
+    text: str
+        The text shown on message box.
     """
-    layout = [
-        [sg.Text('Path')],
-        [
-            sg.InputText(key='Path', default_text=path, tooltip='The path of the file to search'),
-            sg.FileBrowse(initial_folder=os.getcwd())
-        ],
-        [sg.Text('Keywords')],
-        [sg.InputText(key='Keywords', default_text=keywords, tooltip='Single or multiple keywords')],
-        [sg.Text('Separator')],
-        [sg.InputText(key='Separator', tooltip='Required if using multiple keywords')],
-        [sg.Checkbox('Case Sensitive', key='Case Sensitive', tooltip='Case sensitivity of keywords')],
-        [sg.Push(), sg.Button('Generate'), sg.Push(), sg.Text('v1.2.0')]
-    ]
-    return layout
-
-def create_window(title, layout, icon):
-    """ Creates the GUI window based on the provided parameters.
-
-    Parameters
-    ----------
-    title: str
-        The GUI title.
-
-    layout: list
-        The GUI layout.
-
-    icon: str
-        The GUI icon file path.
-
-    Returns
-    -------
-    PySimpleGUI.PySimpleGUI.Window
-        The GUI window object.
-    """
-    return sg.Window(title, layout, icon=icon)
-
-def start_event(title, window):
-    """ Starts the event loop of the GUI window object.
-
-    Parameters
-    ----------
-    title: str
-        The GUI title.
-
-    window: PySimpleGUI.PySimpleGUI.Window
-        The GUI window object.
-
-    Returns
-    -------
-    None
-    """
-    while True:
-        event, values = window.read()
-        if event == sg.WIN_CLOSED:
-            break
-        elif event == 'Generate':
-            path = values['Path']
-            if path and os.path.isfile(path):
-                text = values['Keywords']
-                if text:
-                    separator = values['Separator']
-                    case = values['Case Sensitive']
-                    keywords = get_keywords(text, separator, case)
-                    if keywords:
-                        search_lines(title, path, keywords, case)
-                    else:
-                        show_error(title, 'Separator not found')
-                else:
-                    show_error(title, 'Missing keywords')
-            else:
-                show_error(title, 'Missing or invalid path')
-    window.close()
+    mbox.show(title=GUI_TITLE, text=text)
 
 def main():
-    gui_title = 'Filter Trace File'
     gui_layout = define_layout()
-    gui_icon = 'filtering.ico'
-    gui_window = create_window(gui_title, gui_layout, gui_icon)
-    start_event(gui_title, gui_window)
+    gui_window = create_window(gui_layout)
+    start_event(gui_window)
 
 if __name__ == '__main__':
     main()

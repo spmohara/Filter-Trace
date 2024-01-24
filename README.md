@@ -10,8 +10,9 @@ A program written in Python used to search a file for specific keywords and writ
 WIP
 
 # Dependencies
-- Python 3.x
+- Python 3.6 or above
 - PySimpleGUI 4.60.5
+- Windows
 
 # License
 Licensed under the [MIT License](LICENSE)
