@@ -4,7 +4,7 @@ from filemanager import FileManager
 
 VERSION = 'v1.2.1'
 GUI_TITLE = 'Filter Trace File'
-GUI_ICON = 'C:\\Users\\sohara\\Projects\\Filter-Trace-File\\icons\\filtering.ico'
+GUI_ICON = 'filtering.ico'
 
 file_manager = FileManager()
 
