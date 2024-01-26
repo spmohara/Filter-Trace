@@ -1,7 +1,7 @@
 # Filter Trace File
 
 # Overview
-This project was designed as a troubleshooting tool to analyze system trace log files consisting of captured communication between Extron device drivers and various third-party devices. Because these files include communication of all devices within a system, they can be time-consuming and challenging to follow. This application isolates relevant data for focused troubleshooting by outputting a filtered trace file based on user-specified keywords, which allows users to more easily zero in on specific data to pinpoint driver or device-related issues.
+This project was designed as a troubleshooting tool to analyze system trace log files consisting of captured communication between [Extron](https://www.extron.com/) device drivers and various third-party devices. Because these files include communication of all devices within a system, they can be time-consuming and challenging to follow. This application isolates relevant data for focused troubleshooting by outputting a filtered trace file based on user-specified keywords, which allows users to more easily zero in on specific data to pinpoint driver or device-related issues.
 
 # Description
 An intuitive GUI-based Python application allowing a user to easily extract data from a file based on specific keywords to generate a focused output file.
@@ -11,6 +11,8 @@ An intuitive GUI-based Python application allowing a user to easily extract data
 - Option to select case sensitivity of keywords
 - Line number references to the original file
 - User-friendly message boxes and tooltips to guide users step-by-step
+
+Download latest released version [here](https://github.com/spmohara/Filter-Trace-File/releases/tag/v1.2.1)
 
 # Usage
 ![GUI Initialize](images/GUI%20Initialize.png)
