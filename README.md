@@ -1,14 +1,14 @@
 # Filter Trace File
 
 # Overview
-This project was designed as a troubleshooting tool to analyze system trace log files consisting of captured communication between Extron device drivers and various third-party devices. Because these files include communication of all devices within a system, they can be time-consuming and challenging to follow. This application isolates relevant data for focused troubleshooting by outputting a filtered trace file based on user-specified keywords, which allows users to zero in on critical data to pinpoint driver or device-related issues.
+This project was designed as a troubleshooting tool to analyze system trace log files consisting of captured communication between Extron device drivers and various third-party devices. Because these files include communication of all devices within a system, they can be time-consuming and challenging to follow. This application isolates relevant data for focused troubleshooting by outputting a filtered trace file based on user-specified keywords, which allows users to more easily zero in on specific data to pinpoint driver or device-related issues.
 
 # Description
-An intuitive GUI-based application written in Python allowing a user to easily extract data from a file based on specific keywords to generate a focused output file.
+An intuitive GUI-based Python application allowing a user to easily extract data from a file based on specific keywords to generate a focused output file.
 
 # Features
 - Ability to specify single or multiple keywords to search
-- Select case sensitivity of keywords
+- Option to select case sensitivity of keywords
 - Line number references to the original file
 - User-friendly message boxes and tooltips to guide users step-by-step
 
@@ -33,11 +33,12 @@ An intuitive GUI-based application written in Python allowing a user to easily e
 
 #### Generate button:
 ![GUI Generate button](images/GUI%20Generate%20button.png)
-- Outputs a text file consisting of only the lines that contain the keywords.
+- Outputs a text file consisting of only the lines that contain keywords.
+- The **Enter** key can also be used to generate the file.
 
 #### Version label:
 ![GUI Version label](images/GUI%20Version%20label.png)
-- Shows the application version.
+- Shows the current version of the application.
 
 #### File Generated successfully:
 ![MsgBox File Generated](images/MsgBox%20File%20Generated.png)
@@ -79,7 +80,7 @@ An intuitive GUI-based application written in Python allowing a user to easily e
 
 #### Unable to read file content:
 ![MsgBox Unable to read file content](images/MsgBox%20Unable%20to%20read%20file%20content.png)
-- Indicates the Path field points to a file that cannot be read, either because the file type is unsupported or the file data is corrupted.
+- Indicates the Path field points to a file that cannot be read, either because the file type is unsupported, or the file data is corrupted.
 
 # Dependencies
 - Python 3.6 or above
