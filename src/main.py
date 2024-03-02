@@ -2,8 +2,8 @@ import PySimpleGUI as sg
 import mbox
 from filemanager import FileManager
 
-VERSION = 'v1.2.1'
-GUI_TITLE = 'Filter Trace File'
+VERSION = 'v1.2.2'
+GUI_TITLE = 'Filter Trace'
 GUI_ICON = 'filtering.ico'
 
 file_manager = FileManager()

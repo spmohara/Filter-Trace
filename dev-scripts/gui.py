@@ -1,7 +1,7 @@
 import PySimpleGUI as sg
 import os
 
-GUI_TITLE = 'Filter Trace File'
+GUI_TITLE = 'Filter Trace'
 
 layout = [
     [sg.Text('Path')],
